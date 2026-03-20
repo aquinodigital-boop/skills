@@ -48,6 +48,7 @@ CATALOGO_SUVINIL = [
             "Varejão das Tintas": {"preco": 319.00, "preco_original": 354.44, "desconto": "Pix"},
             "São Geraldo Tintas": {"preco": 284.90, "preco_original": None, "desconto": None},
             "Mercado Livre (2)": {"preco": 207.28, "preco_original": 323.89, "desconto": "36%"},
+            "Obramax": {"preco": 299.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     {
@@ -61,6 +62,7 @@ CATALOGO_SUVINIL = [
         "precos": {
             "Casa Costa Tintas": {"preco": 89.90, "preco_original": None, "desconto": None},
             "Telhanorte": {"preco": 95.00, "preco_original": None, "desconto": None},
+            "Obramax": {"preco": 79.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     # === LINHA PREMIUM ===
@@ -76,6 +78,7 @@ CATALOGO_SUVINIL = [
             "Mercado Livre": {"preco": 358.80, "preco_original": 478.40, "desconto": "25%"},
             "Telhanorte": {"preco": 419.90, "preco_original": None, "desconto": None},
             "Arena Tintas": {"preco": 399.00, "preco_original": None, "desconto": "Pix"},
+            "Obramax": {"preco": 389.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     {
@@ -183,6 +186,44 @@ CATALOGO_SUVINIL = [
         "aplicacao": "Pisos de concreto, cimento, cerâmicos",
         "precos": {
             "Leroy Merlin": {"preco": 339.90, "preco_original": None, "desconto": None},
+            "Obramax": {"preco": 329.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    # === OBRAMAX EXCLUSIVO (Embalagens 20L) ===
+    {
+        "linha": "Standard",
+        "produto": "Suvinil Rende & Cobre Muito Fosco (Obramax 20L)",
+        "tipo": "Tinta Acrílica Standard",
+        "acabamento": "Fosco",
+        "volume": "20L",
+        "rendimento": "até 189 m² acabado",
+        "aplicacao": "Interno e Externo",
+        "precos": {
+            "Obramax": {"preco": 329.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    {
+        "linha": "Premium",
+        "produto": "Suvinil Toque Fosco Completo (Obramax 20L)",
+        "tipo": "Tinta Acrílica Premium",
+        "acabamento": "Fosco",
+        "volume": "20L",
+        "rendimento": "até 167 m² acabado",
+        "aplicacao": "Interno e Externo",
+        "precos": {
+            "Obramax": {"preco": 449.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    {
+        "linha": "Econômica",
+        "produto": "Suvinil Glasu Econômica (Obramax 20L)",
+        "tipo": "Tinta Acrílica Econômica",
+        "acabamento": "Fosco",
+        "volume": "20L",
+        "rendimento": "até 200 m²/demão",
+        "aplicacao": "Interno",
+        "precos": {
+            "Obramax": {"preco": 199.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     # === INOVA ===
@@ -210,6 +251,9 @@ def scrape_precos_online():
     fontes_urls = [
         ("Varejão das Tintas", "https://loja.varejaodastintas.com.br/marca/suvinil.html"),
         ("Tintomax", "https://www.tintomax.com.br/suvinil"),
+        ("Obramax", "https://www.obramax.com.br/suvinil"),
+        ("Cofema Atacadista", "https://www.cofema.com.br/"),
+        ("Eletroleste", "https://www.eletroleste.com.br/"),
     ]
 
     for nome_fonte, url in fontes_urls:
@@ -484,6 +528,10 @@ def gerar_excel(catalogo, precos_extras=None):
         ["Casa Costa Tintas", "https://www.casacostatintas.com.br/", "Varejo online"],
         ["Hipertintas", "https://www.hipertintas.com.br/tintas/parede/suvinil/18", "Varejo online"],
         ["Buscapé", "https://www.buscape.com.br/busca/tinta+suvinil+18+litros", "Comparador de preços"],
+        ["Obramax", "https://www.obramax.com.br/suvinil", "Home center atacado/varejo"],
+        ["Cofema Atacadista", "https://www.cofema.com.br/", "Atacadista materiais construção"],
+        ["Eletroleste", "https://www.eletroleste.com.br/", "Atacadista materiais construção"],
+        ["Smarfer", "N/D (fonte do cliente)", "Distribuidora (a confirmar)"],
     ]
     for row, data in enumerate(fontes, 3):
         for col, val in enumerate(data, 1):
