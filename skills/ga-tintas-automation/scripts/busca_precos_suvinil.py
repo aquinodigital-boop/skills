@@ -34,7 +34,38 @@ HEADERS = {
 
 # Catálogo de produtos SUVINIL com preços de referência coletados de fontes públicas
 CATALOGO_SUVINIL = [
-    # === LINHA STANDARD ===
+    # === LINHA STANDARD — Rende & Cobre Muito ===
+    {
+        "linha": "Standard",
+        "produto": "Suvinil Rende & Cobre Muito Fosco",
+        "tipo": "Tinta Acrílica Standard",
+        "acabamento": "Fosco",
+        "volume": "0.9L",
+        "rendimento": "até 25 m² acabado",
+        "aplicacao": "Interno e Externo",
+        "precos": {
+            "Construtintas": {"preco": 39.90, "preco_original": None, "desconto": None},
+            "Hipertintas": {"preco": 39.90, "preco_original": None, "desconto": "5% Pix"},
+            "Arena Tintas": {"preco": 35.30, "preco_original": None, "desconto": "Pix"},
+            "Magazine Luiza": {"preco": 38.90, "preco_original": None, "desconto": None},
+        },
+    },
+    {
+        "linha": "Standard",
+        "produto": "Suvinil Rende & Cobre Muito Fosco",
+        "tipo": "Tinta Acrílica Standard",
+        "acabamento": "Fosco",
+        "volume": "3.6L",
+        "rendimento": "até 100 m²/demão",
+        "aplicacao": "Interno e Externo",
+        "precos": {
+            "Hipertintas": {"preco": 115.90, "preco_original": None, "desconto": "5% Pix"},
+            "Rei das Tintas": {"preco": 128.00, "preco_original": None, "desconto": None},
+            "Casa Costa Tintas": {"preco": 89.90, "preco_original": None, "desconto": None},
+            "Telhanorte": {"preco": 95.00, "preco_original": None, "desconto": None},
+            "Obramax": {"preco": 79.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
     {
         "linha": "Standard",
         "produto": "Suvinil Rende & Cobre Muito Fosco",
@@ -56,19 +87,60 @@ CATALOGO_SUVINIL = [
         "produto": "Suvinil Rende & Cobre Muito Fosco",
         "tipo": "Tinta Acrílica Standard",
         "acabamento": "Fosco",
-        "volume": "3.6L",
-        "rendimento": "até 60 m²/demão",
+        "volume": "20L",
+        "rendimento": "até 189 m² acabado",
         "aplicacao": "Interno e Externo",
         "precos": {
-            "Casa Costa Tintas": {"preco": 89.90, "preco_original": None, "desconto": None},
-            "Telhanorte": {"preco": 95.00, "preco_original": None, "desconto": None},
-            "Obramax": {"preco": 79.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+            "Obramax": {"preco": 329.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+            "Mercado Livre": {"preco": 391.69, "preco_original": None, "desconto": None},
         },
     },
-    # === LINHA PREMIUM ===
+    # === LINHA STANDARD — Tetos ===
+    {
+        "linha": "Standard",
+        "produto": "Suvinil Tetos Acrílica Fosca",
+        "tipo": "Tinta Acrílica Standard para Tetos",
+        "acabamento": "Fosco",
+        "volume": "3.6L",
+        "rendimento": "até 23 m² acabado",
+        "aplicacao": "Interno e Externo coberto",
+        "precos": {
+            "Obramax": {"preco": 69.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+            "Telhanorte": {"preco": 79.90, "preco_original": None, "desconto": None},
+        },
+    },
+    # === LINHA PREMIUM — Toque Fosco Completo ===
     {
         "linha": "Premium",
-        "produto": "Suvinil Fosco Completo",
+        "produto": "Suvinil Toque Fosco Completo",
+        "tipo": "Tinta Acrílica Premium",
+        "acabamento": "Fosco",
+        "volume": "0.9L",
+        "rendimento": "até 15 m² acabado",
+        "aplicacao": "Interno e Externo",
+        "precos": {
+            "Hipertintas": {"preco": 47.90, "preco_original": None, "desconto": None},
+        },
+    },
+    {
+        "linha": "Premium",
+        "produto": "Suvinil Toque Fosco Completo",
+        "tipo": "Tinta Acrílica Premium",
+        "acabamento": "Fosco",
+        "volume": "3.6L",
+        "rendimento": "até 30 m² acabado",
+        "aplicacao": "Interno e Externo",
+        "precos": {
+            "Hipertintas": {"preco": 139.90, "preco_original": None, "desconto": "Branco Neve"},
+            "Hipertintas (Areia)": {"preco": 185.90, "preco_original": None, "desconto": None},
+            "Telhanorte": {"preco": 109.90, "preco_original": None, "desconto": None},
+            "Bela Tintas": {"preco": 115.00, "preco_original": None, "desconto": None},
+            "Obramax": {"preco": 99.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    {
+        "linha": "Premium",
+        "produto": "Suvinil Toque Fosco Completo",
         "tipo": "Tinta Acrílica Premium",
         "acabamento": "Fosco",
         "volume": "18L",
@@ -83,15 +155,14 @@ CATALOGO_SUVINIL = [
     },
     {
         "linha": "Premium",
-        "produto": "Suvinil Fosco Completo",
+        "produto": "Suvinil Toque Fosco Completo",
         "tipo": "Tinta Acrílica Premium",
         "acabamento": "Fosco",
-        "volume": "3.6L",
-        "rendimento": "até 76 m²/demão",
+        "volume": "20L",
+        "rendimento": "até 167 m² acabado",
         "aplicacao": "Interno e Externo",
         "precos": {
-            "Telhanorte": {"preco": 109.90, "preco_original": None, "desconto": None},
-            "Bela Tintas": {"preco": 115.00, "preco_original": None, "desconto": None},
+            "Obramax": {"preco": 449.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     # === LINHA SELECT (ALTO PADRÃO) ===
@@ -149,7 +220,44 @@ CATALOGO_SUVINIL = [
             "Leroy Merlin": {"preco": 349.90, "preco_original": None, "desconto": None},
         },
     },
-    # === LÁTEX ECONÔMICO ===
+    # === ECONÔMICA — Glasu ===
+    {
+        "linha": "Econômica",
+        "produto": "Suvinil Glasu Econômica",
+        "tipo": "Tinta Acrílica Econômica",
+        "acabamento": "Fosco",
+        "volume": "3.6L",
+        "rendimento": "até 20 m² acabado",
+        "aplicacao": "Interno",
+        "precos": {
+            "Obramax": {"preco": 52.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    {
+        "linha": "Econômica",
+        "produto": "Suvinil Glasu Econômica",
+        "tipo": "Tinta Acrílica Econômica",
+        "acabamento": "Fosco",
+        "volume": "20L",
+        "rendimento": "até 200 m²/demão",
+        "aplicacao": "Interno",
+        "precos": {
+            "Obramax": {"preco": 199.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    # === ECONÔMICA — Látex Maxx ===
+    {
+        "linha": "Econômica",
+        "produto": "Suvinil Látex Maxx",
+        "tipo": "Tinta Látex Econômica",
+        "acabamento": "Fosco",
+        "volume": "3.6L",
+        "rendimento": "até 56 m²/demão",
+        "aplicacao": "Interno",
+        "precos": {
+            "Bela Tintas": {"preco": 49.90, "preco_original": None, "desconto": None},
+        },
+    },
     {
         "linha": "Econômica",
         "produto": "Suvinil Látex Maxx",
@@ -163,16 +271,29 @@ CATALOGO_SUVINIL = [
             "Mercado Livre": {"preco": 169.90, "preco_original": None, "desconto": None},
         },
     },
+    # === ECONÔMICA — Gesso & Drywall ===
     {
         "linha": "Econômica",
-        "produto": "Suvinil Látex Maxx",
-        "tipo": "Tinta Látex Econômica",
+        "produto": "Suvinil Gesso & Drywall",
+        "tipo": "Tinta Acrílica Econômica para Gesso",
         "acabamento": "Fosco",
         "volume": "3.6L",
-        "rendimento": "até 56 m²/demão",
-        "aplicacao": "Interno",
+        "rendimento": "até 24 m² acabado",
+        "aplicacao": "Interno (gesso e drywall)",
         "precos": {
-            "Bela Tintas": {"preco": 49.90, "preco_original": None, "desconto": None},
+            "Obramax": {"preco": 45.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+        },
+    },
+    {
+        "linha": "Econômica",
+        "produto": "Suvinil Gesso & Drywall",
+        "tipo": "Tinta Acrílica Econômica para Gesso",
+        "acabamento": "Fosco",
+        "volume": "18L",
+        "rendimento": "até 180 m²/demão",
+        "aplicacao": "Interno (gesso e drywall)",
+        "precos": {
+            "Obramax": {"preco": 159.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     # === TINTA PARA PISO ===
@@ -189,41 +310,17 @@ CATALOGO_SUVINIL = [
             "Obramax": {"preco": 329.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
-    # === OBRAMAX EXCLUSIVO (Embalagens 20L) ===
+    # === PREPARAÇÃO ===
     {
-        "linha": "Standard",
-        "produto": "Suvinil Rende & Cobre Muito Fosco (Obramax 20L)",
-        "tipo": "Tinta Acrílica Standard",
-        "acabamento": "Fosco",
-        "volume": "20L",
-        "rendimento": "até 189 m² acabado",
-        "aplicacao": "Interno e Externo",
+        "linha": "Preparação",
+        "produto": "Suvinil Fundo Preparador de Parede",
+        "tipo": "Fundo Preparador",
+        "acabamento": "Transparente",
+        "volume": "3.6L",
+        "rendimento": "até 55 m²/demão",
+        "aplicacao": "Interno e Externo (preparação de superfície)",
         "precos": {
-            "Obramax": {"preco": 329.90, "preco_original": None, "desconto": "Atacado/Varejo"},
-        },
-    },
-    {
-        "linha": "Premium",
-        "produto": "Suvinil Toque Fosco Completo (Obramax 20L)",
-        "tipo": "Tinta Acrílica Premium",
-        "acabamento": "Fosco",
-        "volume": "20L",
-        "rendimento": "até 167 m² acabado",
-        "aplicacao": "Interno e Externo",
-        "precos": {
-            "Obramax": {"preco": 449.90, "preco_original": None, "desconto": "Atacado/Varejo"},
-        },
-    },
-    {
-        "linha": "Econômica",
-        "produto": "Suvinil Glasu Econômica (Obramax 20L)",
-        "tipo": "Tinta Acrílica Econômica",
-        "acabamento": "Fosco",
-        "volume": "20L",
-        "rendimento": "até 200 m²/demão",
-        "aplicacao": "Interno",
-        "precos": {
-            "Obramax": {"preco": 199.90, "preco_original": None, "desconto": "Atacado/Varejo"},
+            "Obramax": {"preco": 59.90, "preco_original": None, "desconto": "Atacado/Varejo"},
         },
     },
     # === INOVA ===
