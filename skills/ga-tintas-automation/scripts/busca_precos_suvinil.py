@@ -531,7 +531,7 @@ def gerar_excel(catalogo, precos_extras=None):
         ["Obramax", "https://www.obramax.com.br/suvinil", "Home center atacado/varejo"],
         ["Cofema Atacadista", "https://www.cofema.com.br/", "Atacadista materiais construção"],
         ["Eletroleste", "https://www.eletroleste.com.br/", "Atacadista materiais construção"],
-        ["Smarfer", "N/D (fonte do cliente)", "Distribuidora (a confirmar)"],
+        ["Ismafer", "https://www.ismafer.com.br/", "Varejo ferragens e ferramentas"],
     ]
     for row, data in enumerate(fontes, 3):
         for col, val in enumerate(data, 1):
