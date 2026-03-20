@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — GA Distribuidora de Tintas</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:#f0f2f5; color:#1a1a2e; }
+.header { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); color:#fff; padding:24px 32px; }
+.header h1 { font-size:24px; font-weight:700; }
+.header p { opacity:.7; margin-top:4px; font-size:14px; }
+.container { max-width:1400px; margin:0 auto; padding:20px; }
+
+/* KPI Cards */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+.kpi-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); text-align:center; }
+.kpi-card .number { font-size:36px; font-weight:800; color:#0f3460; }
+.kpi-card .label { font-size:13px; color:#666; margin-top:4px; text-transform:uppercase; letter-spacing:.5px; }
+.kpi-card.green .number { color:#2e7d32; }
+.kpi-card.orange .number { color:#e65100; }
+.kpi-card.blue .number { color:#1565c0; }
+.kpi-card.red .number { color:#c62828; }
+
+/* Sections */
+.section { background:#fff; border-radius:12px; padding:24px; margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.section h2 { font-size:18px; font-weight:700; color:#1a1a2e; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid #e0e0e0; }
+
+/* Tables */
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#1a1a2e; color:#fff; padding:10px 12px; text-align:left; font-weight:600; position:sticky; top:0; }
+td { padding:8px 12px; border-bottom:1px solid #eee; vertical-align:top; }
+tr:hover { background:#f5f5f5 !important; }
+.money { text-align:right; font-family:'Courier New',monospace; font-weight:600; }
+.center { text-align:center; }
+
+/* Badges */
+.badge { padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; }
+.badge-direto { background:#ffebee; color:#c62828; }
+.badge-indireto { background:#e3f2fd; color:#1565c0; }
+.badge-ref { background:#e8f5e9; color:#2e7d32; }
+.badge-linha { background:#f3e5f5; color:#6a1b9a; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; }
+
+/* Charts */
+.chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+.chart-container { position:relative; height:350px; }
+@media(max-width:900px) { .chart-grid { grid-template-columns:1fr; } }
+
+/* Tabs */
+.tabs { display:flex; gap:4px; margin-bottom:16px; }
+.tab { padding:8px 20px; border:none; background:#e0e0e0; color:#666; border-radius:8px 8px 0 0; cursor:pointer; font-size:14px; font-weight:600; }
+.tab.active { background:#1a1a2e; color:#fff; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* Search */
+.search { padding:8px 16px; border:1px solid #ddd; border-radius:8px; width:300px; font-size:14px; margin-bottom:12px; }
+.search:focus { outline:none; border-color:#0f3460; box-shadow:0 0 0 3px rgba(15,52,96,.1); }
+
+/* Scroll */
+.table-scroll { max-height:500px; overflow-y:auto; border-radius:8px; border:1px solid #e0e0e0; }
+
+/* Footer */
+.footer { text-align:center; padding:20px; color:#999; font-size:12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>GA Distribuidora de Tintas LTDA</h1>
+    <p>Dashboard de Inteligencia Competitiva — Mercado B2B Tintas Sao Paulo | Atualizado em 20/03/2026 20:59</p>
+</div>
+
+<div class="container">
+
+<!-- KPI Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card blue">
+        <div class="number">15</div>
+        <div class="label">Concorrentes Mapeados</div>
+    </div>
+    <div class="kpi-card red">
+        <div class="number">10</div>
+        <div class="label">Concorrentes Diretos</div>
+    </div>
+    <div class="kpi-card orange">
+        <div class="number">5</div>
+        <div class="label">Concorrentes Indiretos</div>
+    </div>
+    <div class="kpi-card green">
+        <div class="number">22</div>
+        <div class="label">Produtos Monitorados</div>
+    </div>
+    <div class="kpi-card">
+        <div class="number">49</div>
+        <div class="label">Pontos de Preco</div>
+    </div>
+    <div class="kpi-card">
+        <div class="number">15</div>
+        <div class="label">Fontes de Preco</div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="section">
+    <h2>Comparativo de Precos SUVINIL</h2>
+    <div class="chart-grid">
+        <div>
+            <h3 style="text-align:center;margin-bottom:8px;color:#666;font-size:14px">Latas 18L — Faixa de Preco</h3>
+            <div class="chart-container"><canvas id="chart18L"></canvas></div>
+        </div>
+        <div>
+            <h3 style="text-align:center;margin-bottom:8px;color:#666;font-size:14px">Galoes 3.6L — Faixa de Preco</h3>
+            <div class="chart-container"><canvas id="chart36L"></canvas></div>
+        </div>
+    </div>
+    <div class="chart-grid">
+        <div>
+            <h3 style="text-align:center;margin-bottom:8px;color:#666;font-size:14px">Distribuicao por Tipo de Concorrente</h3>
+            <div class="chart-container"><canvas id="chartConc"></canvas></div>
+        </div>
+        <div>
+            <h3 style="text-align:center;margin-bottom:8px;color:#666;font-size:14px">Produtos por Fonte de Preco</h3>
+            <div class="chart-container"><canvas id="chartLojas"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="section">
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('tab-precos',this)">Precos SUVINIL</button>
+        <button class="tab" onclick="showTab('tab-concorrentes',this)">Concorrentes</button>
+    </div>
+
+    <div id="tab-precos" class="tab-content active">
+        <input type="text" class="search" id="searchPrecos" placeholder="Buscar produto, linha, loja..." oninput="filterTable('tblPrecos','searchPrecos')">
+        <div class="table-scroll">
+        <table id="tblPrecos">
+            <thead>
+                <tr>
+                    <th>Linha</th>
+                    <th>Produto</th>
+                    <th>Volume</th>
+                    <th>Menor Preco</th>
+                    <th>Maior Preco</th>
+                    <th>Preco Medio</th>
+                    <th>Variacao</th>
+                    <th>Melhor Loja</th>
+                    <th>Detalhes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background:#e8f5e9">
+            <td><span class="badge-linha">Standard</span></td>
+            <td><strong>Suvinil Rende & Cobre Muito Fosco</strong></td>
+            <td class="center">0.9L</td>
+            <td class="money">R$ 35.30</td>
+            <td class="money">R$ 39.90</td>
+            <td class="money">R$ 38.50</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">13%</td>
+            <td>Arena Tintas</td>
+            <td><small>Construtintas: R$ 39.90, Hipertintas: R$ 39.90, Arena Tintas: R$ 35.30, Magazine Luiza: R$ 38.90</small></td>
+        </tr><tr style="background:#e8f5e9">
+            <td><span class="badge-linha">Standard</span></td>
+            <td><strong>Suvinil Rende & Cobre Muito Fosco</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 79.90</td>
+            <td class="money">R$ 128.00</td>
+            <td class="money">R$ 101.74</td>
+            <td class="center" style="color:#e53935;font-weight:bold">60%</td>
+            <td>Obramax</td>
+            <td><small>Hipertintas: R$ 115.90, Rei das Tintas: R$ 128.00, Casa Costa Tintas: R$ 89.90, Telhanorte: R$ 95.00, Obramax: R$ 79.90</small></td>
+        </tr><tr style="background:#e8f5e9">
+            <td><span class="badge-linha">Standard</span></td>
+            <td><strong>Suvinil Rende & Cobre Muito Fosco</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 207.28</td>
+            <td class="money">R$ 339.07</td>
+            <td class="money">R$ 290.03</td>
+            <td class="center" style="color:#e53935;font-weight:bold">64%</td>
+            <td>Mercado Livre (2)</td>
+            <td><small>Mercado Livre: R$ 339.07, Varejão das Tintas: R$ 319.00, São Geraldo Tintas: R$ 284.90, Mercado Livre (2): R$ 207.28, Obramax: R$ 299.90</small></td>
+        </tr><tr style="background:#e8f5e9">
+            <td><span class="badge-linha">Standard</span></td>
+            <td><strong>Suvinil Rende & Cobre Muito Fosco</strong></td>
+            <td class="center">20L</td>
+            <td class="money">R$ 329.90</td>
+            <td class="money">R$ 391.69</td>
+            <td class="money">R$ 360.79</td>
+            <td class="center" style="color:#ff9800;font-weight:bold">19%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 329.90, Mercado Livre: R$ 391.69</small></td>
+        </tr><tr style="background:#e8f5e9">
+            <td><span class="badge-linha">Standard</span></td>
+            <td><strong>Suvinil Tetos Acrílica Fosca</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 69.90</td>
+            <td class="money">R$ 79.90</td>
+            <td class="money">R$ 74.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">14%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 69.90, Telhanorte: R$ 79.90</small></td>
+        </tr><tr style="background:#fff3e0">
+            <td><span class="badge-linha">Premium</span></td>
+            <td><strong>Suvinil Toque Fosco Completo</strong></td>
+            <td class="center">0.9L</td>
+            <td class="money">R$ 47.90</td>
+            <td class="money">R$ 47.90</td>
+            <td class="money">R$ 47.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Hipertintas</td>
+            <td><small>Hipertintas: R$ 47.90</small></td>
+        </tr><tr style="background:#fff3e0">
+            <td><span class="badge-linha">Premium</span></td>
+            <td><strong>Suvinil Toque Fosco Completo</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 99.90</td>
+            <td class="money">R$ 185.90</td>
+            <td class="money">R$ 130.12</td>
+            <td class="center" style="color:#e53935;font-weight:bold">86%</td>
+            <td>Obramax</td>
+            <td><small>Hipertintas: R$ 139.90, Hipertintas (Areia): R$ 185.90, Telhanorte: R$ 109.90, Bela Tintas: R$ 115.00, Obramax: R$ 99.90</small></td>
+        </tr><tr style="background:#fff3e0">
+            <td><span class="badge-linha">Premium</span></td>
+            <td><strong>Suvinil Toque Fosco Completo</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 358.80</td>
+            <td class="money">R$ 419.90</td>
+            <td class="money">R$ 391.90</td>
+            <td class="center" style="color:#ff9800;font-weight:bold">17%</td>
+            <td>Mercado Livre</td>
+            <td><small>Mercado Livre: R$ 358.80, Telhanorte: R$ 419.90, Arena Tintas: R$ 399.00, Obramax: R$ 389.90</small></td>
+        </tr><tr style="background:#fff3e0">
+            <td><span class="badge-linha">Premium</span></td>
+            <td><strong>Suvinil Toque Fosco Completo</strong></td>
+            <td class="center">20L</td>
+            <td class="money">R$ 449.90</td>
+            <td class="money">R$ 449.90</td>
+            <td class="money">R$ 449.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 449.90</small></td>
+        </tr><tr style="background:#e3f2fd">
+            <td><span class="badge-linha">Select</span></td>
+            <td><strong>Suvinil Toque Fosco Select</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 414.76</td>
+            <td class="money">R$ 759.73</td>
+            <td class="money">R$ 621.16</td>
+            <td class="center" style="color:#e53935;font-weight:bold">83%</td>
+            <td>Mercado Livre (2)</td>
+            <td><small>Mercado Livre: R$ 759.73, Mercado Livre (2): R$ 414.76, Arena Tintas: R$ 689.00</small></td>
+        </tr><tr style="background:#fce4ec">
+            <td><span class="badge-linha">Esmaltes</span></td>
+            <td><strong>Suvinil Esmalte Cor & Proteção Base Água Acetinado</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 265.16</td>
+            <td class="money">R$ 289.90</td>
+            <td class="money">R$ 277.53</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">9%</td>
+            <td>Arena Tintas</td>
+            <td><small>Arena Tintas: R$ 265.16, Leroy Merlin: R$ 289.90</small></td>
+        </tr><tr style="background:#fce4ec">
+            <td><span class="badge-linha">Esmaltes</span></td>
+            <td><strong>Suvinil Esmalte Cor & Proteção Grafite Fosco</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 308.09</td>
+            <td class="money">R$ 308.09</td>
+            <td class="money">R$ 308.09</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Arena Tintas</td>
+            <td><small>Arena Tintas: R$ 308.09</small></td>
+        </tr><tr style="background:#fce4ec">
+            <td><span class="badge-linha">Especiais</span></td>
+            <td><strong>Suvinil Epóxi</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 327.97</td>
+            <td class="money">R$ 349.90</td>
+            <td class="money">R$ 338.94</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">7%</td>
+            <td>Arena Tintas</td>
+            <td><small>Arena Tintas: R$ 327.97, Leroy Merlin: R$ 349.90</small></td>
+        </tr><tr style="background:#f1f8e9">
+            <td><span class="badge-linha">Econômica</span></td>
+            <td><strong>Suvinil Glasu Econômica</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 52.90</td>
+            <td class="money">R$ 52.90</td>
+            <td class="money">R$ 52.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 52.90</small></td>
+        </tr><tr style="background:#f1f8e9">
+            <td><span class="badge-linha">Econômica</span></td>
+            <td><strong>Suvinil Glasu Econômica</strong></td>
+            <td class="center">20L</td>
+            <td class="money">R$ 199.90</td>
+            <td class="money">R$ 199.90</td>
+            <td class="money">R$ 199.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 199.90</small></td>
+        </tr><tr style="background:#f1f8e9">
+            <td><span class="badge-linha">Econômica</span></td>
+            <td><strong>Suvinil Látex Maxx</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 49.90</td>
+            <td class="money">R$ 49.90</td>
+            <td class="money">R$ 49.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Bela Tintas</td>
+            <td><small>Bela Tintas: R$ 49.90</small></td>
+        </tr><tr style="background:#f1f8e9">
+            <td><span class="badge-linha">Econômica</span></td>
+            <td><strong>Suvinil Látex Maxx</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 169.90</td>
+            <td class="money">R$ 189.90</td>
+            <td class="money">R$ 179.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">12%</td>
+            <td>Mercado Livre</td>
+            <td><small>Bela Tintas: R$ 189.90, Mercado Livre: R$ 169.90</small></td>
+        </tr><tr style="background:#f1f8e9">
+            <td><span class="badge-linha">Econômica</span></td>
+            <td><strong>Suvinil Gesso & Drywall</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 45.90</td>
+            <td class="money">R$ 45.90</td>
+            <td class="money">R$ 45.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 45.90</small></td>
+        </tr><tr style="background:#f1f8e9">
+            <td><span class="badge-linha">Econômica</span></td>
+            <td><strong>Suvinil Gesso & Drywall</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 159.90</td>
+            <td class="money">R$ 159.90</td>
+            <td class="money">R$ 159.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 159.90</small></td>
+        </tr><tr style="background:#e0f7fa">
+            <td><span class="badge-linha">Pisos</span></td>
+            <td><strong>Suvinil Piso Acrílica</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 329.90</td>
+            <td class="money">R$ 339.90</td>
+            <td class="money">R$ 334.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">3%</td>
+            <td>Obramax</td>
+            <td><small>Leroy Merlin: R$ 339.90, Obramax: R$ 329.90</small></td>
+        </tr><tr style="background:#f3e5f5">
+            <td><span class="badge-linha">Preparação</span></td>
+            <td><strong>Suvinil Fundo Preparador de Parede</strong></td>
+            <td class="center">3.6L</td>
+            <td class="money">R$ 59.90</td>
+            <td class="money">R$ 59.90</td>
+            <td class="money">R$ 59.90</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">0%</td>
+            <td>Obramax</td>
+            <td><small>Obramax: R$ 59.90</small></td>
+        </tr><tr style="background:#fff3e0">
+            <td><span class="badge-linha">Premium</span></td>
+            <td><strong>Suvinil Inova Fosco Sempre Limpo</strong></td>
+            <td class="center">18L</td>
+            <td class="money">R$ 499.00</td>
+            <td class="money">R$ 529.90</td>
+            <td class="money">R$ 514.45</td>
+            <td class="center" style="color:#4caf50;font-weight:bold">6%</td>
+            <td>Arena Tintas</td>
+            <td><small>Arena Tintas: R$ 499.00, Leroy Merlin: R$ 529.90</small></td>
+        </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <div id="tab-concorrentes" class="tab-content">
+        <input type="text" class="search" id="searchConc" placeholder="Buscar empresa, CNPJ, segmento..." oninput="filterTable('tblConc','searchConc')">
+        <div class="table-scroll">
+        <table id="tblConc">
+            <thead>
+                <tr>
+                    <th>Empresa</th>
+                    <th>CNPJ</th>
+                    <th>Endereco</th>
+                    <th>Tipo</th>
+                    <th>Segmento</th>
+                    <th>Marcas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+            <td><strong>Gama Tintas</strong><br><small style="color:#888">GAMA DISTRIBUIDORA DE TINTAS LTDA (Referência)</small></td>
+            <td>07.161.840/0001-85</td>
+            <td>Estrada Vovó Carolina, 1821 – Guaianazes, São Paulo – SP, CEP 08473-370</td>
+            <td><span class="badge badge-ref">Referência</span></td>
+            <td>Distribuição B2B - Tintas e acessórios para pintura</td>
+            <td>Diversas marcas nacionais</td>
+        </tr><tr>
+            <td><strong>Miral Distribuidora</strong><br><small style="color:#888">MIRAL TINTAS LTDA</small></td>
+            <td>02.344.515/0001-34</td>
+            <td>Rua Antonio Mariano, 357 – Jardim Ipanema (Zona Sul), São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Distribuição B2B - Tintas Suvinil, ferramentas e acessórios</td>
+            <td>Suvinil</td>
+        </tr><tr>
+            <td><strong>B1 Tintas</strong><br><small style="color:#888">B1 DISTRIBUIDORA DE TINTAS LTDA</small></td>
+            <td>N/D</td>
+            <td>São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Distribuição B2B - Tintas residenciais, industriais, marítimas, automotivas</td>
+            <td>Múltiplas marcas internacionais e nacionais</td>
+        </tr><tr>
+            <td><strong>CIA Distribuidora</strong><br><small style="color:#888">CIA DISTRIBUIDORA DE TINTAS LTDA</small></td>
+            <td>N/D</td>
+            <td>São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Distribuição B2B - Tintas, ferramentas e acessórios</td>
+            <td>Coral, Tigre, Tramontina, International, Sil, Henkel</td>
+        </tr><tr>
+            <td><strong>Tintas MC</strong><br><small style="color:#888">TINTAS MC LTDA</small></td>
+            <td>N/D</td>
+            <td>Diversas lojas em São Paulo – SP</td>
+            <td><span class="badge badge-indireto">Indireto</span></td>
+            <td>Varejo e distribuição - Maior rede de lojas de tintas do Brasil</td>
+            <td>Múltiplas marcas</td>
+        </tr><tr>
+            <td><strong>Prema Tintas</strong><br><small style="color:#888">PREMA TINTAS E PRESERVAÇÃO DE MADEIRAS S.A.</small></td>
+            <td>N/D</td>
+            <td>São Paulo – SP</td>
+            <td><span class="badge badge-indireto">Indireto</span></td>
+            <td>Fabricação e distribuição B2B</td>
+            <td>Marca própria Prema</td>
+        </tr><tr>
+            <td><strong>Tintas JD</strong><br><small style="color:#888">TINTAS JD LTDA</small></td>
+            <td>N/D</td>
+            <td>São Paulo – SP</td>
+            <td><span class="badge badge-indireto">Indireto</span></td>
+            <td>Varejo e distribuição de tintas</td>
+            <td>Múltiplas marcas</td>
+        </tr><tr>
+            <td><strong>JE Tintas</strong><br><small style="color:#888">J E TINTAS CIA LTDA</small></td>
+            <td>56.932.175/0001-91</td>
+            <td>Rua Alexandre Giusti, 182 – Jardim dos Manacás, São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Distribuição B2B - Materiais de construção e tintas</td>
+            <td>N/D</td>
+        </tr><tr>
+            <td><strong>Biadola Tintas</strong><br><small style="color:#888">BIADOLA COMÉRCIO DE TINTAS EM GERAL E REPRESENTAÇÃO COMERCIAL</small></td>
+            <td>06.060.908/0001-77</td>
+            <td>São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Distribuição B2B e representação comercial de tintas</td>
+            <td>N/D</td>
+        </tr><tr>
+            <td><strong>Tintas Irajá</strong><br><small style="color:#888">INDÚSTRIA QUÍMICA IRAJÁ LTDA</small></td>
+            <td>60.910.023/0001-65</td>
+            <td>Rua Forte do Rio Branco, 619 – Parque São Lourenço, São Paulo – SP</td>
+            <td><span class="badge badge-indireto">Indireto</span></td>
+            <td>Fabricação e distribuição B2B de tintas</td>
+            <td>Marca própria Irajá</td>
+        </tr><tr>
+            <td><strong>Agile Atacadista</strong><br><small style="color:#888">AGILE ATACADISTA LTDA</small></td>
+            <td>N/D</td>
+            <td>São Paulo – Zona Leste, SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Distribuição B2B - Tintas automotivas e produtos automotivos</td>
+            <td>Brazilian Color e outras</td>
+        </tr><tr>
+            <td><strong>Martins Atacado</strong><br><small style="color:#888">MARTINS COMÉRCIO E SERVIÇOS DE DISTRIBUIÇÃO S.A.</small></td>
+            <td>43.214.055/0001-07</td>
+            <td>Uberlândia – MG (atuação nacional incluindo SP)</td>
+            <td><span class="badge badge-indireto">Indireto</span></td>
+            <td>Distribuição B2B generalista com linha de tintas</td>
+            <td>Pratik, Tekbond, Thompson, Xadrez, Condor</td>
+        </tr><tr>
+            <td><strong>Obramax</strong><br><small style="color:#888">OBRAMAX ATACADO S.A.</small></td>
+            <td>N/D</td>
+            <td>Diversas lojas em São Paulo – SP e outras capitais</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Atacado e varejo de materiais de construção com ampla linha de tintas (Suvinil, Coral, etc.)</td>
+            <td>Suvinil, Coral, e outras (75+ produtos Suvinil disponíveis)</td>
+        </tr><tr>
+            <td><strong>Cofema Atacadista</strong><br><small style="color:#888">COFEMA ATACADISTA LTDA</small></td>
+            <td>69.194.454/0001-47</td>
+            <td>Av. Aricanduva, 3241 – Vila Aricanduva, São Paulo – SP, CEP 03.527-000</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Atacadista de ferragens, ferramentas, tintas e materiais de construção — filiais em Sumaré, Bauru, Ribeirão Preto e Araçatuba</td>
+            <td>Diversas marcas de tintas e materiais de construção</td>
+        </tr><tr>
+            <td><strong>Eletroleste</strong><br><small style="color:#888">ELETROLESTE DISTRIBUIDORA LTDA</small></td>
+            <td>N/D</td>
+            <td>Av. Aricanduva, 5555 – São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Atacadista de materiais hidráulicos, elétricos, ferramentas, tintas e máquinas</td>
+            <td>Diversas marcas de tintas e materiais de construção</td>
+        </tr><tr>
+            <td><strong>Ismafer</strong><br><small style="color:#888">RA MARTINS BORGES & NEGÓCIOS LTDA</small></td>
+            <td>08.492.961/0004-15</td>
+            <td>São Paulo – SP</td>
+            <td><span class="badge badge-direto">Direto</span></td>
+            <td>Comércio varejista de ferragens, ferramentas, tintas e materiais de construção</td>
+            <td>Diversas marcas de ferramentas e tintas</td>
+        </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<div class="footer">
+    GA Distribuidora de Tintas LTDA — Dashboard de Inteligencia Competitiva — Gerado automaticamente em 20/03/2026 20:59
+</div>
+
+<script>
+const DATA = {"concorrentes": {"diretos": 10, "indiretos": 5, "total": 15}, "precos_18l": [{"nome": "Rende & Cobre Muito Fosco", "menor": 207.28, "maior": 339.07, "media": 290.03}, {"nome": "Toque Fosco Completo", "menor": 358.8, "maior": 419.9, "media": 391.9}, {"nome": "Toque Fosco Select", "menor": 414.76, "maior": 759.73, "media": 621.16}, {"nome": "Látex Maxx", "menor": 169.9, "maior": 189.9, "media": 179.9}, {"nome": "Gesso & Drywall", "menor": 159.9, "maior": 159.9, "media": 159.9}, {"nome": "Piso Acrílica", "menor": 329.9, "maior": 339.9, "media": 334.9}, {"nome": "Inova Fosco Sempre Limpo", "menor": 499.0, "maior": 529.9, "media": 514.45}], "precos_36l": [{"nome": "Rende & Cobre Muito Fosco", "menor": 79.9, "maior": 128.0, "media": 101.74}, {"nome": "Tetos Acrílica Fosca", "menor": 69.9, "maior": 79.9, "media": 74.9}, {"nome": "Toque Fosco Completo", "menor": 99.9, "maior": 185.9, "media": 130.12}, {"nome": "Esmalte Cor & Proteção Base Água Acetinado", "menor": 265.16, "maior": 289.9, "media": 277.53}, {"nome": "Esmalte Cor & Proteção Grafite Fosco", "menor": 308.09, "maior": 308.09, "media": 308.09}, {"nome": "Epóxi", "menor": 327.97, "maior": 349.9, "media": 338.94}, {"nome": "Glasu Econômica", "menor": 52.9, "maior": 52.9, "media": 52.9}, {"nome": "Látex Maxx", "menor": 49.9, "maior": 49.9, "media": 49.9}, {"nome": "Gesso & Drywall", "menor": 45.9, "maior": 45.9, "media": 45.9}, {"nome": "Fundo Preparador de Parede", "menor": 59.9, "maior": 59.9, "media": 59.9}], "por_loja": {"Arena Tintas": 7, "Bela Tintas": 3, "Casa Costa Tintas": 1, "Construtintas": 1, "Hipertintas": 4, "Hipertintas (Areia)": 1, "Leroy Merlin": 4, "Magazine Luiza": 1, "Mercado Livre": 5, "Mercado Livre (2)": 2, "Obramax": 13, "Rei das Tintas": 1, "São Geraldo Tintas": 1, "Telhanorte": 4, "Varejão das Tintas": 1}};
+
+// Tabs
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+}
+
+// Search
+function filterTable(tableId, inputId) {
+    const q = document.getElementById(inputId).value.toLowerCase();
+    const rows = document.getElementById(tableId).querySelectorAll('tbody tr');
+    rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+
+// Charts
+const colors = {
+    blue: 'rgba(21,101,192,0.7)',
+    red: 'rgba(198,40,40,0.7)',
+    green: 'rgba(46,125,50,0.7)',
+    orange: 'rgba(230,81,0,0.7)',
+    purple: 'rgba(106,27,154,0.7)',
+    teal: 'rgba(0,137,123,0.7)',
+};
+
+// 18L Chart
+if (DATA.precos_18l.length) {
+    new Chart(document.getElementById('chart18L'), {
+        type: 'bar',
+        data: {
+            labels: DATA.precos_18l.map(p => p.nome),
+            datasets: [
+                { label: 'Menor', data: DATA.precos_18l.map(p => p.menor), backgroundColor: colors.green },
+                { label: 'Medio', data: DATA.precos_18l.map(p => p.media), backgroundColor: colors.blue },
+                { label: 'Maior', data: DATA.precos_18l.map(p => p.maior), backgroundColor: colors.red },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true, ticks: { callback: v => 'R$ ' + v } },
+                       x: { ticks: { maxRotation: 45 } } }
+        }
+    });
+}
+
+// 3.6L Chart
+if (DATA.precos_36l.length) {
+    new Chart(document.getElementById('chart36L'), {
+        type: 'bar',
+        data: {
+            labels: DATA.precos_36l.map(p => p.nome),
+            datasets: [
+                { label: 'Menor', data: DATA.precos_36l.map(p => p.menor), backgroundColor: colors.green },
+                { label: 'Medio', data: DATA.precos_36l.map(p => p.media), backgroundColor: colors.blue },
+                { label: 'Maior', data: DATA.precos_36l.map(p => p.maior), backgroundColor: colors.red },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true, ticks: { callback: v => 'R$ ' + v } },
+                       x: { ticks: { maxRotation: 45 } } }
+        }
+    });
+}
+
+// Concorrentes Pie
+new Chart(document.getElementById('chartConc'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Diretos', 'Indiretos'],
+        datasets: [{ data: [DATA.concorrentes.diretos, DATA.concorrentes.indiretos], backgroundColor: [colors.red, colors.blue] }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+// Lojas Bar
+const lojaLabels = Object.keys(DATA.por_loja).sort((a,b) => DATA.por_loja[b] - DATA.por_loja[a]);
+const lojaValues = lojaLabels.map(l => DATA.por_loja[l]);
+new Chart(document.getElementById('chartLojas'), {
+    type: 'bar',
+    data: {
+        labels: lojaLabels,
+        datasets: [{ label: 'Produtos', data: lojaValues, backgroundColor: colors.teal }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+    }
+});
+</script>
+</body>
+</html>
