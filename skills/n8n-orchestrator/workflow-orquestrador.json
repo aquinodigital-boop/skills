@@ -1,0 +1,471 @@
+{
+  "name": "Orquestrador Multi-Agente Aquinobrasil",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [220, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Bot ALERTAS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20241022\",\n  \"max_tokens\": 300,\n  \"system\": \"Voce e um classificador de demandas empresariais. Classifique a mensagem em EXATAMENTE uma categoria. Responda APENAS com o JSON, sem explicacao.\\n\\nCategorias:\\n- PRECIFICACAO: margem, markup, preco, custo, tabela de precos\\n- SEO: SEO, Google, palavras-chave, otimizacao, ranking, busca organica\\n- CONTEUDO: post, conteudo, legenda, copy, criativo, carrossel, stories, reels\\n- PLANEJAMENTO: estrategia, plano, roadmap, cronograma, meta, objetivo\\n- OPERACIONAL: processo, rotina, fluxo, automacao, sistema, ferramenta\\n- OUTRO: nao se encaixa em nenhuma categoria acima\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Classifique: {{ $json.message.text }}\\n\\nResponda no formato JSON:\\n{\\\"categoria\\\": \\\"NOME\\\", \\\"confianca\\\": 0.0, \\\"area\\\": \\\"descricao curta\\\", \\\"energia\\\": \\\"alta/media/baixa\\\"}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "classificador",
+      "name": "Classificador Claude",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse da resposta do classificador\nconst responseText = $input.first().json.content[0].text;\n\n// Tenta extrair JSON da resposta\nlet classificacao;\ntry {\n  // Remove possivel markdown code block\n  const cleanText = responseText.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  classificacao = JSON.parse(cleanText);\n} catch (e) {\n  classificacao = {\n    categoria: 'OUTRO',\n    confianca: 0.5,\n    area: 'Nao classificado',\n    energia: 'media'\n  };\n}\n\n// Dados originais\nconst mensagemOriginal = $('Telegram Trigger').first().json.message.text;\nconst chatId = $('Telegram Trigger').first().json.message.chat.id;\nconst userName = $('Telegram Trigger').first().json.message.from.first_name || 'Usuario';\n\nreturn [{\n  json: {\n    mensagem: mensagemOriginal,\n    chatId: chatId,\n    userName: userName,\n    categoria: classificacao.categoria,\n    confianca: classificacao.confianca,\n    area: classificacao.area,\n    energia: classificacao.energia,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "parse-classificacao",
+      "name": "Parse Classificacao",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-precificacao",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "PRECIFICACAO",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": "Precificacao"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-seo",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "SEO",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": "SEO"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-conteudo",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "CONTEUDO",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": "Conteudo"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-planejamento",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "PLANEJAMENTO",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": "Planejamento"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-operacional",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "OPERACIONAL",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": "Operacional"
+            }
+          ],
+          "fallbackOutput": {
+            "renameOutput": "Central"
+          }
+        },
+        "options": {}
+      },
+      "id": "router",
+      "name": "Router Categorias",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20241022\",\n  \"max_tokens\": 1500,\n  \"system\": \"Voce e o Agente de Precificacao da Aquinobrasil, especialista em tintas e materiais de construcao.\\n\\nSeu papel:\\n- Analisar margens e markup de produtos\\n- Sugerir precos competitivos\\n- Avaliar custos e rentabilidade\\n- Comparar com mercado\\n\\nContexto da empresa:\\n- Loja de tintas e materiais de construcao\\n- Marcas: Coral, Suvinil, Sherwin-Williams\\n- Markup medio do setor: 35-55%\\n- Foco em margem liquida saudavel\\n\\nResponda de forma direta e pratica, com numeros quando possivel. Use formatacao clara.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.mensagem }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "agente-precificacao",
+      "name": "Agente Precificacao",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 60],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20241022\",\n  \"max_tokens\": 1500,\n  \"system\": \"Voce e o Agente de SEO da Aquinobrasil, especialista em otimizacao para buscas no segmento de tintas e materiais de construcao.\\n\\nSeu papel:\\n- Pesquisar e sugerir palavras-chave\\n- Analisar e otimizar conteudo para SEO\\n- Sugerir meta titles e descriptions\\n- Avaliar oportunidades de ranking\\n\\nContexto:\\n- E-commerce de tintas e materiais\\n- Foco em SEO local e organico\\n- Concorrentes: grandes redes e lojas locais\\n\\nResponda com sugestoes praticas e acionaveis.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.mensagem }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "agente-seo",
+      "name": "Agente SEO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=SUBSTITUA_GEMINI_API_KEY",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Voce e o Diretor Criativo da Aquinobrasil, especialista em conteudo para redes sociais no segmento de tintas e decoracao.\\n\\nSeu papel:\\n- Criar posts, legendas e copies\\n- Sugerir ideias de conteudo para Instagram, Facebook, TikTok\\n- Desenvolver carrosseis e roteiros de reels\\n- Planejar calendarios editoriais\\n\\nTom de voz: profissional mas acessivel, inspirador, focado em transformacao de ambientes.\\n\\nDemanda: {{ $json.mensagem }}\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.8,\n    \"maxOutputTokens\": 1500\n  }\n}",
+        "options": {}
+      },
+      "id": "agente-conteudo",
+      "name": "Agente Diretor Criativo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20241022\",\n  \"max_tokens\": 1500,\n  \"system\": \"Voce e o Agente de Planejamento Estrategico da Aquinobrasil.\\n\\nSeu papel:\\n- Criar planos e roadmaps\\n- Definir metas e KPIs\\n- Sugerir cronogramas de acao\\n- Analisar cenarios estrategicos\\n\\nContexto: loja de tintas e materiais de construcao buscando crescimento sustentavel.\\n\\nResponda com planos estruturados e acionaveis.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.mensagem }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "agente-planejamento",
+      "name": "Agente Planejamento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 480],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20241022\",\n  \"max_tokens\": 1500,\n  \"system\": \"Voce e o Agente Operacional da Aquinobrasil.\\n\\nSeu papel:\\n- Otimizar processos e rotinas\\n- Sugerir automacoes\\n- Avaliar ferramentas e sistemas\\n- Melhorar fluxos de trabalho\\n\\nContexto: loja de tintas com operacao fisica e digital.\\n\\nResponda com sugestoes praticas e implementaveis.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.mensagem }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "agente-operacional",
+      "name": "Agente Operacional",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 620],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20241022\",\n  \"max_tokens\": 1500,\n  \"system\": \"Voce e o Agente Central da Aquinobrasil. Responda perguntas gerais sobre o negocio de tintas e materiais de construcao. Seja util e direto.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.mensagem }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "agente-central",
+      "name": "Agente Central",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 760],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Anthropic API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai a resposta do agente (Claude ou Gemini)\nconst input = $input.first().json;\nlet respostaAgente = '';\n\n// Tenta formato Claude\nif (input.content && input.content[0] && input.content[0].text) {\n  respostaAgente = input.content[0].text;\n}\n// Tenta formato Gemini\nelse if (input.candidates && input.candidates[0]) {\n  respostaAgente = input.candidates[0].content.parts[0].text;\n}\nelse {\n  respostaAgente = 'Desculpe, nao consegui processar sua solicitacao. Tente novamente.';\n}\n\n// Recupera dados do parse\nconst parseData = $('Parse Classificacao').first().json;\n\n// Limita resposta pra Telegram (4096 chars)\nif (respostaAgente.length > 4000) {\n  respostaAgente = respostaAgente.substring(0, 3997) + '...';\n}\n\nreturn [{\n  json: {\n    chatId: parseData.chatId,\n    resposta: respostaAgente,\n    categoria: parseData.categoria,\n    area: parseData.area,\n    energia: parseData.energia,\n    mensagemOriginal: parseData.mensagem,\n    userName: parseData.userName,\n    timestamp: parseData.timestamp\n  }\n}];"
+      },
+      "id": "format-resposta",
+      "name": "Formatar Resposta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.resposta }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-send",
+      "name": "Responder Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1660, 240],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Bot ALERTAS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "byName",
+          "value": "Log_Orquestrador"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Demanda": "={{ $json.mensagemOriginal }}",
+            "Agente": "={{ $json.categoria }}",
+            "Area": "={{ $json.area }}",
+            "Energia": "={{ $json.energia }}",
+            "Resposta_Resumo": "={{ $json.resposta.substring(0, 200) }}",
+            "Status": "OK"
+          }
+        },
+        "options": {}
+      },
+      "id": "sheets-log",
+      "name": "Log Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1660, 420],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [{ "node": "Classificador Claude", "type": "main", "index": 0 }]
+      ]
+    },
+    "Classificador Claude": {
+      "main": [
+        [{ "node": "Parse Classificacao", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Classificacao": {
+      "main": [
+        [{ "node": "Router Categorias", "type": "main", "index": 0 }]
+      ]
+    },
+    "Router Categorias": {
+      "main": [
+        [{ "node": "Agente Precificacao", "type": "main", "index": 0 }],
+        [{ "node": "Agente SEO", "type": "main", "index": 0 }],
+        [{ "node": "Agente Diretor Criativo", "type": "main", "index": 0 }],
+        [{ "node": "Agente Planejamento", "type": "main", "index": 0 }],
+        [{ "node": "Agente Operacional", "type": "main", "index": 0 }],
+        [{ "node": "Agente Central", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agente Precificacao": {
+      "main": [
+        [{ "node": "Formatar Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agente SEO": {
+      "main": [
+        [{ "node": "Formatar Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agente Diretor Criativo": {
+      "main": [
+        [{ "node": "Formatar Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agente Planejamento": {
+      "main": [
+        [{ "node": "Formatar Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agente Operacional": {
+      "main": [
+        [{ "node": "Formatar Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agente Central": {
+      "main": [
+        [{ "node": "Formatar Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Formatar Resposta": {
+      "main": [
+        [
+          { "node": "Responder Telegram", "type": "main", "index": 0 },
+          { "node": "Log Google Sheets", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "orquestrador" },
+    { "name": "multi-agente" },
+    { "name": "aquinobrasil" }
+  ],
+  "triggerCount": 1,
+  "pinData": {}
+}
